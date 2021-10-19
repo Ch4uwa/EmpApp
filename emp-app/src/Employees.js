@@ -1,6 +1,6 @@
 import Employee from "./Employee";
 
-const Employees = ({ employees, onToggle, showInfo }) => {
+const Employees = ({ employees, onToggle }) => {
   return (
     <>
       {employees.map((employee) => (
@@ -8,7 +8,6 @@ const Employees = ({ employees, onToggle, showInfo }) => {
           key={employee.id}
           employee={employee}
           onToggle={onToggle}
-          showInfo={showInfo}
         />
       ))}
     </>

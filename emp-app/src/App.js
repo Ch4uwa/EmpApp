@@ -1,44 +1,50 @@
 import { useEffect, useState } from "react";
-import "./App.css";
 import EmployeeInfo from "./EmployeeInfo";
 import Employees from "./Employees";
-import Sample from "./extra/Sample.json";
 
 function App() {
   const [showEmployeeInfo, setShowEmployeeInfo] = useState(false);
-  const [employees, setEmployees] = useState(Sample["data"]);
+  const [employees, setEmployees] = useState([]);
+  const [emp, setEmp] = useState([]);
 
+  useEffect(() => {
+    const getEmployees = async () => {
+      const employeesFromApi = await fetchEmployees();
+      setEmployees(employeesFromApi["data"]);
+    };
 
-  // Not using while testing to save on requests.
-  // useEffect(() => {
-  //   const getEmployees = async () => {
-  //     const employeesFromApi = await fetchEmployees();
-  //     setEmployees(employeesFromApi["data"]);
-  //   };
-
-  //   getEmployees();
-  // }, []);
+    getEmployees();
+  }, []);
 
   // Fetch all Employees
-  // const fetchEmployees = async () => {
-  //   const res = await fetch("http://dummy.restapiexample.com/api/v1/employees");
-  //   const data = await res.json();
+  const fetchEmployees = async () => {
+    const res = await fetch("http://dummy.restapiexample.com/api/v1/employees");
+    const data = await res.json();
 
-  //   return data;
-  // };
+    console.log("fetchEmployees ran");
+    return data;
+  };
 
   // Fetch single Employee
-  // const fetchEmployee = async ({ empId }) => {
-  //   const res = await fetch(
-  //     `http://dummy.restapiexample.com/api/v1/employee/${empId}`
-  //   );
-  //   const data = await res.json();
+  const fetchEmployee = async (id) => {
+    const res = await fetch(
+      `http://dummy.restapiexample.com/api/v1/employee/${id}`
+    );
+    const data = await res.json();
 
-  //   return data;
-  // };
+    console.log("fetchEmployee ran");
+    return data;
+  };
 
-  const toggleInfo = () => {
-    setShowEmployeeInfo(!showEmployeeInfo);
+  const showEmpInfo = async (id) => {
+    const employeeToShow = await fetchEmployee(id);
+    employeeToShow.status === "success" && setShowEmployeeInfo(true);
+
+    setEmp(employeeToShow["data"]);
+  };
+
+  const hideEmpInfo = () => {
+    setShowEmployeeInfo(false);
   };
 
   return (
@@ -46,11 +52,14 @@ function App() {
       <header className="App-header">
         <h1>Employees</h1>
       </header>
-      <Employees
-        employees={employees}
-        onToggle={toggleInfo}
-        showInfo={showEmployeeInfo}
-      />
+      {showEmployeeInfo ? (
+        <EmployeeInfo
+          employee={emp}
+          showEmployeeInfo={hideEmpInfo}
+        />
+      ) : (
+        <Employees employees={employees} onToggle={showEmpInfo} />
+      )}
     </div>
   );
 }
